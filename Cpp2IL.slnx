@@ -21,6 +21,7 @@
   <Project Path="Cpp2IL.Plugin.Mfuscator/Cpp2IL.Plugin.Mfuscator.csproj" />
   <Project Path="Cpp2IL.Plugin.OrbisPkg/Cpp2IL.Plugin.OrbisPkg.csproj" />
   <Project Path="Cpp2IL.Plugin.Pdb/Cpp2IL.Plugin.Pdb.csproj" />
+  <Project Path="Cpp2IL.Plugin.ProtoDescriptorExtractor/Cpp2IL.Plugin.ProtoDescriptorExtractor.csproj" Id="c01f3e5e-c4d6-4e19-8d5d-74bf1b935fc2" />
   <Project Path="Cpp2IL.Plugin.StrippedCodeRegSupport/Cpp2IL.Plugin.StrippedCodeRegSupport.csproj" />
   <Project Path="Cpp2IL/Cpp2IL.csproj" />
   <Project Path="LibCpp2IL/LibCpp2IL.csproj" />
