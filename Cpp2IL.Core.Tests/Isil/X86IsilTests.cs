@@ -63,7 +63,7 @@ public class X86IsilTests
         Add(13, OpCode.Move, r9, 0);
         Add(14, OpCode.Move, rcx, rax);
         Add(15, OpCode.Move, r8, 0);
-        Add(16, OpCode.CallVoid, (ulong)0x180267A70, rcx, rdx, r8);
+        Add(16, OpCode.CallVoid, (ulong)0x180267A70, rcx, rdx, r8, r9);
         Add(17, OpCode.Return);
         Add(18, OpCode.Return);
         
@@ -76,7 +76,7 @@ public class X86IsilTests
             if (instruction.OpCode is OpCode.Jump or OpCode.ConditionalJump)
                 instruction.Operands[0] = instructions[(int)instruction.Operands[0]];
 
-            Assert.True(instruction == isil[i], $"expected: {instruction}, but got {isil[i]}");
+            Assert.True(instruction.IsStructurallyEqualTo(isil[i]), $"expected: {instruction}, but got {isil[i]}");
         }
     }
 }

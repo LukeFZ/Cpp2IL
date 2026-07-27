@@ -392,13 +392,19 @@ public class MethodAnalysisContext : HasGenericParameters, IMethodInfoProvider
         // single-assignment and a type, once known, is stable for that value.
         MetadataResolver.ResolveAll(this);
 
-        // Resolve KeyFunctionAddress calls.
+        // Resolve KeyFunctionAddress calls, then collect what removing the write barriers left dead.
         KeyFunctionRecovery.Run(this);
+        DeadCodeEliminator.Run(this);
 
         // Delete any il2cpp_codegen_initialize_runtime_metadata/il2cpp_codegen_initialize_method
         MetadataInitGuardRemover.Run(this);
 
         LocalVariables.ResolveTypesAndFields(this);
+
+        // Needs type resolved for delegate locals
+        DelegateInvokeRecovery.Run(this);
+        BooleanFlagSimplifier.Run(this);
+        DeadCodeEliminator.Run(this);
 
         // Copy/constant propagation belongs in SSA, where one definition dominates all uses and phis
         // make joins explicit, so forwarding a value is an unconditional global substitution.

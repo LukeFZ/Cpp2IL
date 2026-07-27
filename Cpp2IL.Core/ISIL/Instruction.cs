@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -7,7 +6,7 @@ using Cpp2IL.Core.Model.Contexts;
 
 namespace Cpp2IL.Core.ISIL;
 
-public class Instruction(int index, OpCode opcode, params object[] operands) : IEquatable<Instruction>
+public class Instruction(int index, OpCode opcode, params object[] operands)
 {
     public int Index = index;
 
@@ -18,7 +17,7 @@ public class Instruction(int index, OpCode opcode, params object[] operands) : I
     public bool IsFallThrough =>
         OpCode switch
         {
-            OpCode.Return or OpCode.Jump or OpCode.ConditionalJump or OpCode.IndirectJump => false,
+            OpCode.Return or OpCode.Jump or OpCode.ConditionalJump or OpCode.IndirectJump or OpCode.Throw => false,
             _ => true
         };
 
@@ -68,6 +67,7 @@ public class Instruction(int index, OpCode opcode, params object[] operands) : I
             // CallVoid has no return value and so has no destination, and a Call may also be emitted
             // without a return-value operand, in which case it likewise has no destination.
             case OpCode.Call:
+            case OpCode.IndirectCall:
                 if (Operands.Count < 2)
                     return null;
                 if (newDestination != null)
@@ -94,6 +94,12 @@ public class Instruction(int index, OpCode opcode, params object[] operands) : I
                 => [Operands[2], Operands[1]],
 
             OpCode.Call => Operands.Skip(2).ToList(),
+
+            // Unlike a direct call, operand 0 is the address being called and so is itself a source.
+            OpCode.IndirectCall => Operands.Count > 2
+                ? Operands.Skip(2).Prepend(Operands[0]).ToList()
+                : Operands.Take(1).ToList(),
+
             OpCode.CallVoid or OpCode.Phi => Operands.Skip(1).ToList(),
             OpCode.CheckEqual or OpCode.CheckGreater or OpCode.CheckLess
                 or OpCode.CheckNotEqual or OpCode.CheckGreaterOrEqual or OpCode.CheckLessOrEqual
@@ -157,19 +163,10 @@ public class Instruction(int index, OpCode opcode, params object[] operands) : I
             _ => true
         };
 
-    public static bool operator ==(Instruction? left, Instruction? right)
-    {
-        if (left is null && right is null)
-            return true;
-        if (left is null || right is null)
-            return false;
-
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(Instruction? left, Instruction? right) => !(left == right);
-
-    public bool Equals(Instruction? other)
+    // Deliberately not Equals/GetHashCode. Instructions are identity objects: the graph, stack analyzer and
+    // IL generator all key sets and dictionaries on the specific instruction instance, and generated
+    // instructions (phi copies, for one) are routinely structurally identical to each other.
+    public bool IsStructurallyEqualTo(Instruction? other)
     {
         if (ReferenceEquals(this, other))
             return true;
@@ -179,17 +176,26 @@ public class Instruction(int index, OpCode opcode, params object[] operands) : I
 
         if (OpCode != other.OpCode)
             return false;
-        
+
         if (Index != other.Index)
             return false;
 
         if (Operands.Count != other.Operands.Count)
             return false;
 
-        for (int i = 0; i < Operands.Count; i++)
+        for (var i = 0; i < Operands.Count; i++)
         {
             var thisOperand = Operands[i];
             var otherOperand = other.Operands[i];
+
+            // Branch targets are compared by index, so a back edge doesn't send us round in circles.
+            if (thisOperand is Instruction thisTarget)
+            {
+                if (otherOperand is not Instruction otherTarget || thisTarget.Index != otherTarget.Index)
+                    return false;
+
+                continue;
+            }
 
             if (!thisOperand.Equals(otherOperand))
                 return false;
@@ -197,19 +203,4 @@ public class Instruction(int index, OpCode opcode, params object[] operands) : I
 
         return true;
     }
-
-    public override bool Equals(object? obj) => obj is Instruction other && Equals(other);
-
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            var hashCode = Index;
-            hashCode = (hashCode * 397) ^ OpCode.GetHashCode();
-            foreach (var operand in Operands)
-                hashCode = (hashCode * 397) ^ operand.GetHashCode();
-            return hashCode;
-        }
-    }
-
 }
