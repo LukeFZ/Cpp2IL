@@ -10,4 +10,8 @@
     <Copy SourceFiles="$(OutDir)/Cpp2IL.Plugin.ProtoDescriptorExtractor.dll" DestinationFolder="$(SolutionDir)/Cpp2IL/bin/$(Configuration)/net10.0/Plugins" />
   </Target>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Cpp2IL.Core\Cpp2IL.Core.csproj" />
+  </ItemGroup>
+
 </Project>

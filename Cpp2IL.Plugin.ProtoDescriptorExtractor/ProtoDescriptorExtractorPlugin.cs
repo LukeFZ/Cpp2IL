@@ -170,7 +170,7 @@ public class ProtoDescriptorOutputFormat : Cpp2IlOutputFormat
                     Operands:
                     [
                         _, LocalVariable descriptorArrayVariableRef,
-                        ArrayTypeAnalysisContext { ElementType: var elementType }, ulong arraySizeValue, _, _
+                        SzArrayTypeAnalysisContext { ElementType: var elementType }, ulong arraySizeValue, _, _
                     ]
                 }
                 && elementType == stringType)
