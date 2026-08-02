@@ -170,7 +170,7 @@ public class ProtoDescriptorOutputFormat : Cpp2IlOutputFormat
                     Operands:
                     [
                         _, LocalVariable descriptorArrayVariableRef,
-                        SzArrayTypeAnalysisContext { ElementType: var elementType }, ulong arraySizeValue, _, _
+                        SzArrayTypeAnalysisContext { ElementType: var elementType }, Immediate {UnsignedValue: var arraySizeValue }, _, _
                     ]
                 }
                 && elementType == stringType)
@@ -193,7 +193,7 @@ public class ProtoDescriptorOutputFormat : Cpp2IlOutputFormat
                     OpCode: OpCode.Move,
                     Operands:
                     [
-                        MemoryOperand { Base: LocalVariable descriptorArrayVariableRef2 }, string partialDescriptorValue2
+                        MemoryOperand { Base: LocalVariable descriptorArrayVariableRef2 }, StringLiteral {Value: var partialDescriptorValue2 }
                     ]
                 } && foundDescriptorArrayVariable == descriptorArrayVariableRef2)
             {
@@ -213,7 +213,7 @@ public class ProtoDescriptorOutputFormat : Cpp2IlOutputFormat
                             Base: LocalVariable descriptorArrayVariableRef0
                         },
                         _,
-                        string partialDescriptorValue, _
+                        StringLiteral {Value: var partialDescriptorValue }, _
                     ]
                 } && descriptorArrayVariableRef0 == foundDescriptorArrayVariable)
             {
@@ -226,8 +226,8 @@ public class ProtoDescriptorOutputFormat : Cpp2IlOutputFormat
                     OpCode: OpCode.Call,
                     Operands:
                     [
-                        _, _, LocalVariable descriptorArrayVariableRef1, ulong targetArrayIndex,
-                        string partialDescriptorValue1, _
+                        _, _, LocalVariable descriptorArrayVariableRef1, Immediate {UnsignedValue: var targetArrayIndex },
+                        StringLiteral { Value: var partialDescriptorValue1 }, _
                     ]
                 } && descriptorArrayVariableRef1 == foundDescriptorArrayVariable
                   && targetArrayIndex == currentArrayIndex)
