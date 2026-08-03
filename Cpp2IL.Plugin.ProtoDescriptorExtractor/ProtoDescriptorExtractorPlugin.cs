@@ -193,7 +193,7 @@ public class ProtoDescriptorOutputFormat : Cpp2IlOutputFormat
                     OpCode: OpCode.Move,
                     Operands:
                     [
-                        MemoryOperand { Base: LocalVariable descriptorArrayVariableRef2 }, StringLiteral {Value: var partialDescriptorValue2 }
+                        ArrayAccess { Array: var descriptorArrayVariableRef2 }, StringLiteral {Value: var partialDescriptorValue2 }
                     ]
                 } && foundDescriptorArrayVariable == descriptorArrayVariableRef2)
             {
@@ -245,7 +245,7 @@ public class ProtoDescriptorOutputFormat : Cpp2IlOutputFormat
             return inst is
                    {
                        OpCode: OpCode.Call,
-                       Operands: [MethodAnalysisContext method, _, LocalVariable descriptorArrayVariableRef, _]
+                       Operands: [MethodAnalysisContext method, _, LocalVariable descriptorArrayVariableRef]
                    }
                    && method == concatMethod
                    && foundDescriptorArrayVariable == descriptorArrayVariableRef;
